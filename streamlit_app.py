@@ -1,4 +1,3 @@
-import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -7,23 +6,25 @@ st.title("Workout Data Analyzer")
 
 st.write("This app allows you to analyze your workout data from Hevy.")
 
+# Define the API URL
+api_url = "https://api.hevyapp.com/v1/workouts"
+
+# Check if the API key is stored in session state
+if 'api_key' not in st.session_state:
+    st.session_state['api_key'] = ''
+
 # Input field for API Key
-api_key = st.text_input("Enter your Hevy API Key:", type="password")
-api_url = "https://api.hevyapp.com/v1/workouts"  
-headers = {"api-key": api_key}      
+api_key_input = st.text_input("Enter your Hevy API Key:", type="password")
 
 # Button to test the API Key
 if st.button("Test API Key"):
-    if api_key:
-        # Test the API key by making a simple request
-
+    if api_key_input:
+        headers = {"api-key": api_key_input}
         try:
             response = requests.get(api_url, headers=headers)
             response.raise_for_status()
+            st.session_state['api_key'] = api_key_input  # Store the API key in session state
             st.success("API Key is valid!")
-            # Optionally, show a snippet of the data
-            data = response.json()
-            st.write("Sample Data:", data[:5])  # Display the first 5 records for preview
         except requests.exceptions.HTTPError as http_err:
             st.error(f"HTTP error occurred: {http_err}")
             st.error(f"Response status code: {response.status_code}")
@@ -33,9 +34,9 @@ if st.button("Test API Key"):
     else:
         st.warning("Please enter an API Key to test.")
 
-
-    
-def fetch_workout_data():
+# Function to fetch workout data
+def fetch_workout_data(api_key):
+    headers = {"api-key": api_key}
     try:
         response = requests.get(api_url, headers=headers)
         response.raise_for_status()
@@ -46,11 +47,14 @@ def fetch_workout_data():
         st.error(f"Response status code: {response.status_code}")
         st.error(f"Response content: {response.content}")
     except Exception as err:
-        st.error(f"Other error occurred: {err}")
+        st.error(f"An error occurred: {err}")
     return pd.DataFrame()
 
+# Button to fetch workout data
 if st.button("Fetch Workout Data"):
-    data = fetch_workout_data()
-    if not data.empty:
-        st.write(data)
-    
+    if st.session_state['api_key']:
+        data = fetch_workout_data(st.session_state['api_key'])
+        if not data.empty:
+            st.write(data)
+    else:
+        st.warning("Please enter and test your API Key first.")
