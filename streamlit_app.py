@@ -14,11 +14,8 @@ api_key = st.text_input("Enter your Hevy API Key:", type="password")
 if st.button("Test API Key"):
     if api_key:
         # Test the API key by making a simple request
-        api_url = "https://api.hevyapp.com/v1/workouts"
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
+        api_url = "https://api.hevyapp.com/v1/workouts"        
+        headers = {"api-key": api_key}
 
         try:
             response = requests.get(api_url, headers=headers)
