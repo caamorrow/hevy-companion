@@ -9,13 +9,13 @@ st.write("This app allows you to analyze your workout data from Hevy.")
 
 # Input field for API Key
 api_key = st.text_input("Enter your Hevy API Key:", type="password")
+api_url = "https://api.hevyapp.com/v1/workouts"  
+headers = {"api-key": api_key}      
 
 # Button to test the API Key
 if st.button("Test API Key"):
     if api_key:
         # Test the API key by making a simple request
-        api_url = "https://api.hevyapp.com/v1/workouts"        
-        headers = {"api-key": api_key}
 
         try:
             response = requests.get(api_url, headers=headers)
